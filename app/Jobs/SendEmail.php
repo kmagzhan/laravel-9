@@ -16,6 +16,8 @@ class SendEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private string $mailId;
+
     private User $user;
 
     private Mail $mail;
@@ -25,9 +27,11 @@ class SendEmail implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(Mail $mail, User $user)
+    public function __construct(Mail $mail, string $mailId, User $user)
     {
         $this->mail = $mail;
+
+        $this->mailId = $mailId;
 
         $this->user = $user;
     }
@@ -39,6 +43,9 @@ class SendEmail implements ShouldQueue
      */
     public function handle()
     {
+        MailSender::to($this->mail->toEmail)->send(new EmailFromAPI($this->mail, $this->user));
 
+        $this->user->last_email_sent_at = now();
+        $this->user->save();
     }
 }

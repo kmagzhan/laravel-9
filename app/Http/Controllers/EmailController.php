@@ -36,8 +36,8 @@ class EmailController extends Controller
             $redisHelper = app()->make(RedisHelperInterface::class);
 
             $redisHelper->storeRecentMessage($id, $mail->subject, $mail->toEmail);
-//
-//            SendEmail::dispatch($item, $user);
+
+            SendEmail::dispatch($mail, $id, $user);
         }
 
         return $user->getGreeting(true, 'Hi');
