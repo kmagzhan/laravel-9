@@ -29,7 +29,8 @@ class ElasticsearchHelper implements ElasticsearchHelperInterface
                 'body' => [
                     'subject' => $messageSubject,
                     'body' => $messageBody,
-                    'to' => $toEmailAddress
+                    'to' => $toEmailAddress,
+                    'created_at' => now()->timestamp
                 ],
             ];
 
