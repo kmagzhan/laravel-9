@@ -59,7 +59,7 @@ class User extends Authenticatable
      */
     public function motivate()
     {
-        MotivateUser::dispatchNow($this);
+        MotivateUser::dispatchSync($this);
     }
 
     /**
