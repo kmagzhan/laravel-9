@@ -45,7 +45,9 @@ class EmailController extends Controller
             SendEmail::dispatch($mail, $id, $user);
         }
 
-        return $user->getGreeting(true, 'Hi');
+        return [
+            'message' => $user->getGreeting('Hi')
+        ];
     }
 
     private function getElasticSearchClient(): Client
