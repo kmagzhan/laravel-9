@@ -33,9 +33,9 @@ class EmailController extends Controller
             }
 
             /** @var RedisHelperInterface $redisHelper */
-//            $redisHelper = app()->make(RedisHelperInterface::class);
+            $redisHelper = app()->make(RedisHelperInterface::class);
 
-//            $redisHelper->storeRecentMessage($id, $mail->subject, $mail->toEmail);
+            $redisHelper->storeRecentMessage($id, $mail->subject, $mail->toEmail);
 //
 //            SendEmail::dispatch($item, $user);
         }
