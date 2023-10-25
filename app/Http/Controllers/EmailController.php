@@ -8,9 +8,14 @@ use App\Models\User;
 use App\Utilities\Contracts\ElasticsearchHelperInterface;
 use App\Utilities\Contracts\RedisHelperInterface;
 use App\Mail;
+use Elasticsearch\Client;
+use Elasticsearch\ClientBuilder;
+use Illuminate\Http\Request;
 
 class EmailController extends Controller
 {
+    const ELASTICSEARCH_INDEX = 'sent_mails';
+
     public function send(SendEmailsRequest $request, User $user)
     {
         $validated = $request->validated();
@@ -43,9 +48,61 @@ class EmailController extends Controller
         return $user->getGreeting(true, 'Hi');
     }
 
-    //  TODO - BONUS: implement list method
-    public function list()
+    private function getElasticSearchClient(): Client
     {
+        $hosts = config('services.elasticsearch.hosts');
 
+        $hosts = explode(',', $hosts);
+
+        return ClientBuilder::create()
+            ->setHosts($hosts)
+            ->build();
+    }
+
+    public function list(Request $request)
+    {
+        $request->validate([
+            'page' => 'nullable|numeric',
+            'search' => 'nullable|string'
+        ]);
+
+        $elasticsearchClient = $this->getElasticSearchClient();
+
+        $perPage = 10;
+        $page = $request->page ?? 1;
+        $skip = ($page - 1) * $perPage;
+        $search = $request->search ?? '';
+
+        $params = [
+            'index' => self::ELASTICSEARCH_INDEX,
+            'body'  => [
+                'sort' => [
+                    'created_at' => [
+                        'order' => 'desc'
+                    ]
+                ],
+                'from' => $skip,
+                'size' => $perPage
+            ]
+        ];
+
+        if ($search) {
+            $params['body']['query'] = [
+                'wildcard' => [
+                    "subject" => $search,
+                ]
+            ];
+        }
+
+        $results = $elasticsearchClient->search($params);
+
+        $items = array_column($results['hits']['hits'], '_source');
+
+        $total = $results['hits']['total']['value'];
+
+        return [
+            'items' => $items,
+            'total' => $total
+        ];
     }
 }
