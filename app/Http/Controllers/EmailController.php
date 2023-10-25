@@ -27,12 +27,17 @@ class EmailController extends Controller
                 $mail->toEmail
             );
 
+            if (! $id) {
+                //  TODO process unsaved mails
+                continue;
+            }
+
             /** @var RedisHelperInterface $redisHelper */
-            $redisHelper = app()->make(RedisHelperInterface::class);
+//            $redisHelper = app()->make(RedisHelperInterface::class);
 
-            $redisHelper->storeRecentMessage($id, $mail->subject, $mail->toEmail);
-
-            SendEmail::dispatch($item, $user);
+//            $redisHelper->storeRecentMessage($id, $mail->subject, $mail->toEmail);
+//
+//            SendEmail::dispatch($item, $user);
         }
 
         return $user->getGreeting(true, 'Hi');
