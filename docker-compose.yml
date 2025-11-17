@@ -73,7 +73,7 @@ services:
         networks:
             - sail
     elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.29
         ports:
             - '${FORWARD_ELASTICSEARCH_PORT:-9200}:9200'
             - '${FORWARD_ELASTICSEARCH_PORT:-9300}:9300'
